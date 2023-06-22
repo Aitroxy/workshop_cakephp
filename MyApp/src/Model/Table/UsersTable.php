@@ -7,7 +7,6 @@ use Cake\ORM\Query;
 use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
 use Cake\Validation\Validator;
-use Authentication\PasswordHasher\DefaultPasswordHasher;
 
 /**
  * Users Model
@@ -81,18 +80,5 @@ class UsersTable extends Table
         $rules->add($rules->isUnique(['username']), ['errorField' => 'username']);
 
         return $rules;
-    }
-
-}
-
-    class User extends Entity
-    {
-    // ... other methods
-
-    // Automatically hash passwords when they are changed.
-    protected function _setPassword(string $password)
-    {
-        $hasher = new DefaultPasswordHasher();
-        return $hasher->hash($password);
     }
 }
