@@ -7,7 +7,6 @@
         public function index()
         {
             $this->viewBuilder()->setLayout('myLayout');
-            $this->viewBuilder()->setLayout('myLayout');
             $test = "test";
             $bob = "bob";
             $var1 = 1;
@@ -23,7 +22,7 @@
 
         public function page2()
         {
-
+            $this->viewBuilder()->setLayout('myLayout');
         }
     }
 ?>

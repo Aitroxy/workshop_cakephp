@@ -28,13 +28,22 @@ use Cake\ORM\Locator\TableLocator;
 use Cake\Routing\Middleware\AssetMiddleware;
 use Cake\Routing\Middleware\RoutingMiddleware;
 
+use Psr\Http\Message\ServerRequestInterface;
+
+use Authentication\AuthenticationInterface;
+use Authentication\AuthenticationService;
+use Authentication\AuthenticationServiceInterface;
+use Authentication\Middleware\AuthenticationMiddleware;
+use Authentication\AuthenticationServiceProviderInterface;
+
+
 /**
  * Application setup class.
  *
  * This defines the bootstrapping logic and middleware layers you
  * want to use in your application.
  */
-class Application extends BaseApplication
+class Application extends BaseApplication implements AuthenticationServiceProviderInterface
 {
     /**
      * Load all the application configuration and bootstrap logic.
@@ -74,6 +83,8 @@ class Application extends BaseApplication
      */
     public function middleware(MiddlewareQueue $middlewareQueue): MiddlewareQueue
     {
+        $authentication = new AuthenticationMiddleware($this);
+
         $middlewareQueue
             // Catch any exceptions in the lower layers,
             // and make an error page/response
@@ -132,5 +143,51 @@ class Application extends BaseApplication
         $this->addPlugin('Migrations');
 
         // Load more plugins here
+    }
+
+    public function getAuthenticationService(ServerRequestInterface $request, ResponseInterface $response)
+    {
+        $service = new AuthenticationService();
+        $service->setConfig([
+            'unauthenticatedRedirect' => '/users/login',
+            'queryParam' => 'redirect',
+        ]);
+
+        $fields = [
+            'username' => 'email',
+            'password' => 'password'
+        ];
+
+        // Load identifiers
+        $service->loadIdentifier('Authentication.Password', compact('fields'));
+
+        // Load the authenticators, you want session first
+        $service->loadAuthenticator('Authentication.Session');
+        $service->loadAuthenticator('Authentication.Form', [
+            'fields' => $fields,
+            'loginUrl' => '/users/login'
+        ]);
+
+        return $service;
+    }
+
+    /**
+     * Setup the middleware queue your application will use.
+     *
+     * @param \Cake\Http\MiddlewareQueue $middlewareQueue The middleware queue.
+     * @return \Cake\Http\MiddlewareQueue The updated middleware queue.
+     */
+    public function middleware($middlewareQueue)
+    {
+        // Various other middlewares for error handling, routing etc. added here.
+
+        // Create an authentication middleware object
+
+        // Add the middleware to the middleware queue.
+        // Authentication should be added *after* RoutingMiddleware.
+        // So that subdirectory information and routes are loaded.
+        $middlewareQueue->add($authentication);
+
+        return $middlewareQueue;
     }
 }

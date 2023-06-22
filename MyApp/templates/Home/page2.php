@@ -26,7 +26,7 @@
                 By FERRERE Guillyann
             </h2>
             <?= $this->Html->link(
-                'Go to page2', // The text displayed on the button
+                'Go to index', // The text displayed on the button
                 ['controller' => 'home', 'action' => 'index'], // The CakePHP route or URL
                 ['class' => 'button-class'],
                 ['type' => 'button']);
@@ -37,8 +37,7 @@
                 Feel free to interpret and bring this description to life on your canvas!
                 </p>
                 <br>
-                <?= $test?>
-                <!-- <?= $this->Html->image('anime_girl.png') ?> -->
+                <?= $this->Html->image('je_saispas.avif') ?>
             </body>
         </div>
     </header>
